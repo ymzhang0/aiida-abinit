@@ -1,0 +1,80 @@
+default_inputs:
+  clean_workdir: True
+  scf:
+    max_iterations: 5
+    kpoints_distance: 0.3
+    abinit: 
+      parameters:
+        ecut: 8.0,  # Maximal kinetic energy cut-off, in Hartree
+        nstep: 20,  # Maximal number of SCF cycles
+        toldfe: 1.0e-6,  # Will stop when, twice in a row, the difference
+        # between two consecutive evaluations of total energy
+        # differ by less than toldfe (in Hartree)
+      metadata:
+        options:
+          withmpi: True
+  nscf:
+    max_iterations: 5
+    kpoints_distance: 0.3
+    abinit: 
+      parameters:
+        nband: 100       # Number of (occ and empty) bands to be computed
+        nbdbuf: 20       # Do not apply the convergence criterium to the last 20 bands (faster)
+        iscf: -2
+        getden: -1
+        tolwfr: 1.0d-12     # Will stop when this tolerance is achieved
+      metadata:
+        options:
+          withmpi: True
+  screening:
+    max_iterations: 5
+    kpoints_distance: 0.3
+    abinit: 
+      parameters:
+        optdriver: 3        # Screening calculation
+        getwfk: -1       # Obtain WFK file from previous dataset
+        nband: 60       # Bands to be used in the screening calculation
+        ecuteps: 3.6      # Cut-off energy of the planewave set to represent the dielectric matrix.
+                            # It is important to adjust this parameter, that is usually smaller than ecut,
+                            # and between 5 and 10 Ha..
+        ppmfrq: 16.7   # Imaginary frequency where to calculate the screening.
+                            # It is easier (and safer) to let ABINIT compute and use the Drude plasma frequency,
+                            # instead of selecting a value by hand. This would be done thanks to the default value ppmfrq 0.0 .
+      metadata:
+        options:
+          withmpi: True
+  gw:
+    max_iterations: 5
+    kpoints_distance: 0.3
+    abinit: 
+      parameters:
+        optdriver4: 4        # Self-Energy calculation
+        getwfk4: -2       # Obtain WFK file from dataset 1
+        getscr4: -1       # Obtain SCR file from previous dataset
+        nband4: 80       # Bands to be used in the Self-Energy calculation
+        ecutsigx4: 8.0     # Dimension of the G sum in Sigma_x.
+                            # ecutsigx = ecut is usually a wise choice
+                            # (the dimension in Sigma_c is controlled by ecuteps)
+        nkptgw4: 1       # number of k-point where to calculate the GW correction
+        kptgw4:               # k-points in reduced coordinates
+          - 0.000
+          - 0.000
+          - 0.000
+        bdgw4: 
+          - 4
+          - 5     # calculate GW corrections for bands from 4 to 5
+
+
+
+        istwfk: '*1'         # This is mandatory in all the GW steps.
+
+default_protocol: moderate
+protocols:
+  moderate:
+    description: 'Protocol to perform a electron-phonon calculation at normal precision at moderate computational cost.'
+  precise:
+    description: 'Protocol to perform a electron-phonon calculation at high precision at higher computational cost.'
+    kpoints_distance: 0.15
+  fast:
+    description: 'Protocol to perform a electron-phonon calculation at low precision at minimal computational cost for testing purposes.'
+    kpoints_distance: 0.5

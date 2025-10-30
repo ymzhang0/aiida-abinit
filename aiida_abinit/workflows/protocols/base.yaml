@@ -1,0 +1,26 @@
+default_inputs:
+  clean_workdir: True
+  max_iterations: 5
+  kpoints_distance: 0.3
+  abinit: 
+    parameters:
+      ecut: 8.0,  # Maximal kinetic energy cut-off, in Hartree
+      nstep: 20,  # Maximal number of SCF cycles
+      toldfe: 1.0e-6,  # Will stop when, twice in a row, the difference
+      # between two consecutive evaluations of total energy
+      # differ by less than toldfe (in Hartree)
+    metadata:
+      options:
+        withmpi: True
+
+
+default_protocol: moderate
+protocols:
+  moderate:
+    description: 'Protocol to perform a electron-phonon calculation at normal precision at moderate computational cost.'
+  precise:
+    description: 'Protocol to perform a electron-phonon calculation at high precision at higher computational cost.'
+    kpoints_distance: 0.15
+  fast:
+    description: 'Protocol to perform a electron-phonon calculation at low precision at minimal computational cost for testing purposes.'
+    kpoints_distance: 0.5
